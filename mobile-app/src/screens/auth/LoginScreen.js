@@ -1,179 +1,202 @@
 import React, { useState } from 'react';
 import { 
   StyleSheet, 
-  Text, 
   View, 
+  Text, 
   TextInput, 
   TouchableOpacity, 
-  KeyboardAvoidingView, 
+  Image, 
+  SafeAreaView,
+  KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Alert
+  ScrollView
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
+import { Feather as Icon } from '@expo/vector-icons'; 
 
-export default function LoginScreen() {
+// Ajout de la prop { navigation } pour gérer les changements d'écran
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuth();
+  const [secureText, setSecureText] = useState(true);
 
   const handleLogin = () => {
-    // Validation basique des champs
-    if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
-      return;
-    }
-
-    // Appel de la fonction de connexion du AuthContext
-    login(email, password);
+    console.log('Tentative de connexion avec :', email, password);
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-      style={styles.container}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.innerContainer}>
+    <SafeAreaView style={style.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={style.scrollContainer} showsVerticalScrollIndicator={false}>
           
-          {/* En-tête / Logo */}
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>🚚</Text>
-            <Text style={styles.title}>Mobilis App</Text>
-            <Text style={styles.subtitle}>Gestion de déménagement intelligente</Text>
+          {/* ─── HEADER : LOGO & SOU-TITRE ─── */}
+          <View style={style.headerContainer}>
+            <Image 
+              source={require('../../assets/logo.png')}
+              style={style.logo} 
+              resizeMode="contain"
+            />
+            <Text style={style.subtitle}>Connectez-vous à votre espace</Text>
           </View>
 
-          {/* Formulaire de connexion */}
-          <View style={styles.formContainer}>
-            <Text style={styles.label}>Adresse Email</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="exemple@mover.com" 
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+          {/* ─── CARTE BLANCHE (FORMULAIRE) ─── */}
+          <View style={style.card}>
+            
+            {/* Champ Email */}
+            <Text style={style.label}>Email</Text>
+            <View style={style.inputContainer}>
+              <Icon name="mail" size={20} color="#9ca3af" style={style.inputIcon} />
+              <TextInput
+                style={style.input}
+                placeholder="votre@email.com"
+                placeholderTextColor="#9ca3af"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
 
-            <Text style={styles.label}>Mot de passe</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="••••••••" 
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+            {/* Champ Mot de passe */}
+            <Text style={style.label}>Mot de passe</Text>
+            <View style={style.inputContainer}>
+              <Icon name="lock" size={20} color="#9ca3af" style={style.inputIcon} />
+              <TextInput
+                style={style.input}
+                placeholder="••••••••"
+                placeholderTextColor="#9ca3af"
+                secureTextEntry={secureText}
+                autoCapitalize="none"
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity onPress={() => setSecureText(!secureText)}>
+                <Icon name={secureText ? "eye-off" : "eye"} size={20} color="#9ca3af" />
+              </TouchableOpacity>
+            </View>
 
-            {/* Bouton de Connexion */}
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Se connecter</Text>
+            {/* Lien Mot de passe oublié */}
+            <TouchableOpacity style={style.forgotPasswordContainer}>
+              <Text style={style.linkText}>Mot de passe oublié ?</Text>
             </TouchableOpacity>
+
+            {/* Bouton Se connecter */}
+            <TouchableOpacity style={style.button} onPress={handleLogin}>
+              <Text style={style.buttonText}>Se connecter</Text>
+            </TouchableOpacity>
+
+            {/* Lien Créer un compte - AJOUT DE LA NAVIGATION ICI */}
+            <View style={style.footerContainer}>
+              <Text style={style.footerText}>Pas encore de compte ? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+                <Text style={[style.linkText, { fontWeight: '600' }]}>Créer un compte</Text>
+              </TouchableOpacity>
+            </View>
+
           </View>
 
-          {/* Pied de page informatif pour vos tests */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              💡 Astuce test : Un email contenant "mover" connecte un Déménageur, sinon un Client.
-            </Text>
-          </View>
-
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+// ─── STYLES COULEURS & DESIGN ───
+const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#f3f4f6', 
   },
-  innerContainer: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
-  logoContainer: {
+  headerContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
-  logoText: {
-    fontSize: 50,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    letterSpacing: 0.5,
+  logo: {
+    width: 240,
+    height: 60,
+    marginBottom: 15,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
+    fontSize: 16,
+    color: '#4b5563',
+    fontWeight: '400',
   },
-  formContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 20,
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3, // Ombre pour Android
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 5, 
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-    marginTop: 10,
+    color: '#1f2937',
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 48,
+    backgroundColor: '#fff',
+  },
+  inputIcon: {
+    marginRight: 10,
   },
   input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#F5F7FA',
-    borderWidth: 1,
-    borderColor: '#E4E7EC',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 12,
+    flex: 1,
+    color: '#1f2937',
+    fontSize: 15,
+  },
+  forgotPasswordContainer: {
+    alignSelf: 'flex-start',
+    marginTop: 14,
+    marginBottom: 24,
   },
   button: {
-    width: '100%',
-    height: 52,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#3b82f6', 
+    borderRadius: 8,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
-    marginTop: 20,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonText: {
-    color: '#FFF',
+    color: '#ffffff',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
   },
-  footer: {
-    marginTop: 30,
-    alignItems: 'center',
+  footerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 24,
   },
   footerText: {
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
-    paddingHorizontal: 20,
+    color: '#4b5563',
+    fontSize: 14,
+  },
+  linkText: {
+    color: '#2563eb', 
+    fontSize: 14,
   },
 });

@@ -9,18 +9,62 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons'; 
 
-// Ajout de la prop { navigation } pour gérer les changements d'écran
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
 
-  const handleLogin = () => {
-    console.log('Tentative de connexion avec :', email, password);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+
+
+    const API_URL = "http://192.168.1.35:5000"; 
+
+    try {
+      console.log('Tentative de connexion avec :', email);
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          mot_de_passe: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Token reçu :', data.token);
+
+        Alert.alert(
+          "Succès ", 
+          "Bienvenue sur MobilisApp !",
+          [
+            { text: "Continuer", onPress: () => navigation.navigate('Home') } 
+          ]
+        );
+      } else {
+       
+        Alert.alert("Erreur de connexion", data.message || "Identifiants incorrects.");
+      }
+
+    } catch (error) {
+      console.error('Erreur réseau lors du login :', error);
+      Alert.alert(
+        "Erreur de connexion", 
+        "Impossible de joindre le serveur. Veuillez vérifier votre connexion locale ou l'état de votre serveur."
+      );
+    }
   };
 
   return (
@@ -31,7 +75,7 @@ export default function LoginScreen({ navigation }) {
       >
         <ScrollView contentContainerStyle={style.scrollContainer} showsVerticalScrollIndicator={false}>
           
-          {/* ─── HEADER : LOGO & SOU-TITRE ─── */}
+          {/* ─── HEADER : LOGO & SOUS-TITRE ─── */}
           <View style={style.headerContainer}>
             <Image 
               source={require('../../assets/logo.png')}
@@ -78,7 +122,10 @@ export default function LoginScreen({ navigation }) {
             </View>
 
             {/* Lien Mot de passe oublié */}
-            <TouchableOpacity style={style.forgotPasswordContainer}>
+            <TouchableOpacity 
+              style={style.forgotPasswordContainer} 
+              onPress={() => navigation.navigate('ForgotPasswordScreen')}
+            >
               <Text style={style.linkText}>Mot de passe oublié ?</Text>
             </TouchableOpacity>
 
@@ -87,7 +134,7 @@ export default function LoginScreen({ navigation }) {
               <Text style={style.buttonText}>Se connecter</Text>
             </TouchableOpacity>
 
-            {/* Lien Créer un compte - AJOUT DE LA NAVIGATION ICI */}
+            {/* Lien Créer un compte */}
             <View style={style.footerContainer}>
               <Text style={style.footerText}>Pas encore de compte ? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
@@ -103,7 +150,6 @@ export default function LoginScreen({ navigation }) {
   );
 }
 
-// ─── STYLES COULEURS & DESIGN ───
 const style = StyleSheet.create({
   container: {
     flex: 1,

@@ -15,36 +15,30 @@ import { Feather as Icon } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 
 export default function RegisterScreen({ navigation }) {
-  // Sélection du rôle : correspond aux valeurs 'DEMENAGEUR' ou 'CLIENT' de ta base MySQL
   const [role, setRole] = useState('DEMENAGEUR'); 
   
-  // Champs correspondants aux colonnes de ta table UTILISATEUR
   const [prenom, setPrenom] = useState('');
   const [nom, setNom] = useState('');
-  const [email, setEmail] = useState(''); // Champ email correctement initialisé
+  const [email, setEmail] = useState('');
   const [telephone, setTelephone] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
   
-  // Champs spécifiques au rôle Déménageur
   const [companyName, setCompanyName] = useState('');
   const [siret, setSiret] = useState('');
 
   const handleRegister = async () => {
-    // 1. Validation de la présence de tous les champs obligatoires communs
     if (!prenom || !nom || !email || !telephone || !password) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires (*) ");
       return;
     }
 
-    // Validation basique du format de l'email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Erreur", "Veuillez entrer une adresse email valide.");
       return;
     }
     
-    // Validation spécifique additionnelle si c'est un déménageur
     if (role === 'DEMENAGEUR' && (!companyName || !siret)) {
       Alert.alert("Erreur", "Veuillez renseigner le nom de l'entreprise et le SIRET.");
       return;
@@ -57,7 +51,7 @@ export default function RegisterScreen({ navigation }) {
     const userData = {
       prenom_utilisateur: prenom,
       nom_utilisateur: nom,
-      email: email.trim().toLowerCase(), // Formatage de l'email
+      email: email.trim().toLowerCase(),
       telephone: telephone,
       mot_de_passe: password,
       role: role, 
@@ -68,7 +62,6 @@ export default function RegisterScreen({ navigation }) {
     try {
       console.log('Envoi des données d\'inscription au serveur :', userData);
 
-      // 4. Appel HTTP POST vers le backend
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
@@ -79,7 +72,7 @@ export default function RegisterScreen({ navigation }) {
 
       const data = await response.json();
 
-      // 5. Traitement du retour du serveur
+      
       if (response.ok) {
         Alert.alert(
           "Succès ", 
@@ -197,7 +190,6 @@ export default function RegisterScreen({ navigation }) {
               />
             </View>
 
-            {/* CHAMPS SPECIFIQUES AU DÉMÉNAGEUR */}
             {role === 'DEMENAGEUR' && (
               <>
                 {/* Nom de l'entreprise */}
@@ -248,14 +240,12 @@ export default function RegisterScreen({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            {/* Bouton S'inscrire dynamique */}
             <TouchableOpacity style={style.button} onPress={handleRegister}>
               <Text style={style.buttonText}>
                 Créer mon compte {role === 'CLIENT' ? 'Client' : 'Déménageur'}
               </Text>
             </TouchableOpacity>
 
-            {/* Lien Retour à la connexion */}
             <View style={style.footerContainer}>
               <Text style={style.footerText}>Déjà inscrit ? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>

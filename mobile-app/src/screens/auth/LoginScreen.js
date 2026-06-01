@@ -13,11 +13,14 @@ import {
   Alert
 } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons'; 
+import { useAuth } from '../../context/AuthContext'; // Importation du Context d'authentification
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
+  
+  const { login } = useAuth(); // Récupération de la fonction de connexion globale
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -25,8 +28,7 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-
-    const API_URL = "http://192.168.1.35:5000"; 
+    const API_URL = "http://192.168.1.38:5000"; 
 
     try {
       console.log('Tentative de connexion avec :', email);
@@ -38,23 +40,24 @@ export default function LoginScreen({ navigation }) {
         body: JSON.stringify({
           email: email,
           mot_de_passe: password
-        })
+        }) // Parenthèse corrigée ici
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Token reçu :', data.token);
+        console.log('Token reçu avec succès :', data.token);
 
+        // Enregistrement immédiat dans le contexte global (JWT)
+        await login(data.token, data.user); 
+
+        // Alerte de bienvenue
         Alert.alert(
           "Succès ", 
-          "Bienvenue sur MobilisApp !",
-          [
-            { text: "Continuer", onPress: () => navigation.navigate('Home') } 
-          ]
+          "Bienvenue sur MobilisApp !"
         );
+        
       } else {
-       
         Alert.alert("Erreur de connexion", data.message || "Identifiants incorrects.");
       }
 
@@ -62,7 +65,7 @@ export default function LoginScreen({ navigation }) {
       console.error('Erreur réseau lors du login :', error);
       Alert.alert(
         "Erreur de connexion", 
-        "Impossible de joindre le serveur. Veuillez vérifier votre connexion locale ou l'état de votre serveur."
+        "Impossible de joindre le serveur. Veuillez vérifier votre connexion locale ou l'état de votre serveur Express."
       );
     }
   };

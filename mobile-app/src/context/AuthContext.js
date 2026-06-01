@@ -4,22 +4,22 @@ const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); 
+  const [token, setToken] = useState(null);
 
-  const login = (email, password) => {
+  const login = (serverToken, serverUser) => {
+    setToken(serverToken);
+    setUser(serverUser); 
     
-    if (email.includes('mover')) {
-      setUser({ email, role: 'mover' });
-    } else {
-      setUser({ email, role: 'client' });
-    }
+    console.log(" [AuthContext] Utilisateur connecté avec succès :", serverUser);
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

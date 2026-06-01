@@ -6,16 +6,26 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import DashboardScreen from '../screens/mover/DashboardScreen';
 import RequestsScreen from '../screens/client/RequestsScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import AnalyticsDashboardScreen from '../screens/admin/AnalyticsDashboardScreen'; 
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   const { user } = useAuth();
 
+  console.log("======================================");
+  console.log("DEBUG NAVIGATOR - Objet user complet :", JSON.stringify(user));
+  console.log("======================================");
+
+  const userRole = user?.role || user?.role_utilisateur || '';
+  const cleanRole = String(userRole).trim().toUpperCase();
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        user.role === 'mover' ? (
+        cleanRole === 'ADMIN' ? (
+          <Stack.Screen name="AdminAnalytics" component={AnalyticsDashboardScreen} />
+        ) : cleanRole === 'MOVER' || cleanRole === 'DEMENAGEUR' ? (
           <Stack.Screen name="MoverDashboard" component={DashboardScreen} />
         ) : (
           <Stack.Screen name="ClientRequests" component={RequestsScreen} />
@@ -23,8 +33,8 @@ export default function AppNavigator() {
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-          <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         </>
       )}
     </Stack.Navigator>

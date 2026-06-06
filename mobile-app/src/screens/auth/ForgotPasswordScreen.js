@@ -23,7 +23,7 @@ export default function ForgotPasswordScreen({ navigation }) {
   const [step, setStep] = useState('EMAIL'); 
   const [secureText, setSecureText] = useState(true);
 
-  const API_URL = "http://192.168.1.38:5000";
+  const API_URL = "http://192.168.1.36:5000";
 
   // Étape 1 : Demande du code par mail
   const handleRequestCode = async () => {

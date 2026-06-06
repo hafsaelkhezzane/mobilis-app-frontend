@@ -55,7 +55,7 @@ export default function AnalyticsDashboardScreen({ navigation }) {
   const [taskDesc, setTaskDesc] = useState('');
   const [taskStatus, setTaskStatus] = useState('To Do');
 
-  const API_URL = 'http://192.168.1.38:5000/api/admin';
+  const API_URL = 'http://192.168.1.36:5000/api/admin';
 
   const declencherAnimation = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -193,7 +193,11 @@ export default function AnalyticsDashboardScreen({ navigation }) {
 
   const handleMenuAction = (actionLabel) => {
     setMenuVisible(false);
+   if (actionLabel === "Gestion des Clients") {
+    navigation.navigate('ClientsList');
+  } else {
     Alert.alert("Navigation Back-Office", `Ouverture du module : ${actionLabel}`);
+  }
   };
 
   const handleLogout = () => {

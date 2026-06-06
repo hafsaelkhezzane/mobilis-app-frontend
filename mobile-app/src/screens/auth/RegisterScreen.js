@@ -45,7 +45,7 @@ export default function RegisterScreen({ navigation }) {
     }
 
 
-    const API_URL = "http://192.168.1.38:5000"; 
+    const API_URL = "http://192.168.1.36:5000"; 
 
    
     const userData = {

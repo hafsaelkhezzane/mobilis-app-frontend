@@ -13,14 +13,14 @@ import {
   Alert
 } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons'; 
-import { useAuth } from '../../context/AuthContext'; // Importation du Context d'authentification
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
   
-  const { login } = useAuth(); // Récupération de la fonction de connexion globale
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -28,7 +28,7 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    const API_URL = "http://192.168.1.38:5000"; 
+    const API_URL = "http://192.168.1.36:5000"; 
 
     try {
       console.log('Tentative de connexion avec :', email);
@@ -40,7 +40,7 @@ export default function LoginScreen({ navigation }) {
         body: JSON.stringify({
           email: email,
           mot_de_passe: password
-        }) // Parenthèse corrigée ici
+        })
       });
 
       const data = await response.json();
@@ -48,10 +48,8 @@ export default function LoginScreen({ navigation }) {
       if (response.ok) {
         console.log('Token reçu avec succès :', data.token);
 
-        // Enregistrement immédiat dans le contexte global (JWT)
         await login(data.token, data.user); 
 
-        // Alerte de bienvenue
         Alert.alert(
           "Succès ", 
           "Bienvenue sur MobilisApp !"
@@ -127,7 +125,7 @@ export default function LoginScreen({ navigation }) {
             {/* Lien Mot de passe oublié */}
             <TouchableOpacity 
               style={style.forgotPasswordContainer} 
-              onPress={() => navigation.navigate('ForgotPasswordScreen')}
+              onPress={() => navigation.navigate('ForgotPassword')}
             >
               <Text style={style.linkText}>Mot de passe oublié ?</Text>
             </TouchableOpacity>
@@ -140,7 +138,7 @@ export default function LoginScreen({ navigation }) {
             {/* Lien Créer un compte */}
             <View style={style.footerContainer}>
               <Text style={style.footerText}>Pas encore de compte ? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={[style.linkText, { fontWeight: '600' }]}>Créer un compte</Text>
               </TouchableOpacity>
             </View>

@@ -1,35 +1,58 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
+
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
-import DashboardScreen from '../screens/mover/DashboardScreen';
-import RequestsScreen from '../screens/client/RequestsScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
-import AnalyticsDashboardScreen from '../screens/admin/AnalyticsDashboardScreen'; 
+
+import AdminDashboardScreen from '../screens/admin/AnalyticsDashboardScreen'; 
+import MoverDashboardScreen from '../screens/mover/DashboardScreen'; 
+import ClientTabNavigator from '../navigation/ClientTabNavigator'; 
+
+import ChatbotVocalScreen from '../screens/client/ChatbotVocalScreen';
+import DocumentsScreen from '../screens/client/DocumentsScreen';
+import RequestsScreen from '../screens/client/RequestsScreen';
+import ClientsListScreen from '../screens/client/ClientsListScreen';
+import EditProfileScreen from '../screens/client/EditProfileScreen';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   const { user } = useAuth();
+  const userRole = user?.role ? String(user?.role).trim().toUpperCase() : '';
 
-  console.log("======================================");
-  console.log("DEBUG NAVIGATOR - Objet user complet :", JSON.stringify(user));
-  console.log("======================================");
+  // Fonction pour retourner les écrans selon le rôle
+  const renderScreensByRole = () => {
+    if (userRole === 'ADMIN') {
+      return (
+        <>
+          <Stack.Screen name="AdminAnalytics" component={AdminDashboardScreen} />
+          <Stack.Screen name="ClientsList" component={ClientsListScreen} />
+        </>
+      );
+    } 
+    
+    if (userRole === 'MOVER' || userRole === 'DEMENAGEUR') {
+      return <Stack.Screen name="MoverDashboard" component={MoverDashboardScreen} />;
+    }
 
-  const userRole = user?.role || user?.role_utilisateur || '';
-  const cleanRole = String(userRole).trim().toUpperCase();
+    // Espace Client
+    return (
+      <>
+        <Stack.Screen name="ClientMain" component={ClientTabNavigator} />
+        <Stack.Screen name="ChatbotVocal" component={ChatbotVocalScreen} />
+        <Stack.Screen name="Documents" component={DocumentsScreen} />
+        <Stack.Screen name="ClientRequests" component={RequestsScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
+      </>
+    );
+  };
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        cleanRole === 'ADMIN' ? (
-          <Stack.Screen name="AdminAnalytics" component={AnalyticsDashboardScreen} />
-        ) : cleanRole === 'MOVER' || cleanRole === 'DEMENAGEUR' ? (
-          <Stack.Screen name="MoverDashboard" component={DashboardScreen} />
-        ) : (
-          <Stack.Screen name="ClientRequests" component={RequestsScreen} />
-        )
+        renderScreensByRole()
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
